@@ -1,32 +1,6 @@
----
-title: "Project 2 test file"
-author: "Lamia Benyamine"
-format: html
-editor: visual
----
+# Helper functions created and used in Shiny App
 
-```{r}
-#libraries needed
-
-library(jsonlite)
-library(dplyr)
-library(httr)
-library(tidyverse)
-library(lubridate)
-```
-
-API function w endpoints
-
-
-```{r}
-#https://api.energidataservice.dk/dataset/DeclarationProduction?
-#https://api.energidataservice.dk/dataset/StorageUtilization?limit=5
-#https://api.energidataservice.dk/dataset/Forecasts_Hour?limit=5
-energiAPI("Forecasts_Hour",startD = "2024-06-01", priceArea = "DK1")
-```
-
-```{r}
-#Forecasts_Hour
+#Forecasts Power Endpoint function: allows the user to select the start date and the forecast type from the Energi API. Only the current forecast is selected, along with the time stamp when the forecast was generated. The date and time were parsed into different columns.
 
 forecastPower <- function(startDate, forecastType = "all"){
   baseURL <- "https://api.energidataservice.dk/dataset/"
@@ -48,9 +22,9 @@ forecastPower <- function(startDate, forecastType = "all"){
     group_by(TimestampUTC, hour, PriceArea)
   return(data_tb)
 }
-#forecastPower("2024-06-24", "all")
 
-#DeclarationProduction
+#Production Power Endpoint function: allows the user to modify the descending sort variable, production type, and the number of records from the Energi API. Some of the emission columns were selected. The date and time were parsed into different columns.
+
 productionPower <- function(sortDes, productionType, num){
   baseURL <- "https://api.energidataservice.dk/dataset/"
   
@@ -69,14 +43,13 @@ productionPower <- function(sortDes, productionType, num){
   parsed <- fromJSON(urlID)
   data_tb <- as_tibble(parsed$records) |>
     mutate(dateUTC = as_date(ymd_hms(HourUTC)), hour = hour(ymd_hms(HourUTC))) |>
-      select(dateUTC, hour, 2:6)|>
-      group_by(dateUTC, hour, PriceArea)
+    select(dateUTC, hour, 2:6)|>
+    group_by(dateUTC, hour, PriceArea)
   return(data_tb)
 }
-#productionPower(sortDes = "CO2PerkWh", productionType = "all", num = 100)
 
+#Storage Utilization Endpoint function: allows the user to input start date and number of records from the Energi API. Gas Day is sorting ascending so the number of records selected is from the date the user selects. Only the total utilization columns are selected.
 
-# Storage Utilization Endpoint function that allows the user to input start date and number of records. Gas Day is sorting ascending do the number of records selected is from the date the user selects. Only the total utilization columns are selected.
 storageUsage <- function(startDate, num){
   baseURL <- "https://api.energidataservice.dk/dataset/"
   ep1 <- "StorageUtilization?sort=GasDay&start="
@@ -90,11 +63,9 @@ storageUsage <- function(startDate, num){
     select(GasDay, contains("Total"))
   return(data_tb)
 }
-#storageUsage(startDate = "2024-05-01", num = 50)
-```
 
-API wrapper function
-```{r}
+#Wrapper API function for the user to select the data endpoint.
+
 energiAPI <- function(data,...){
   if(data == "forecastPower"){
     output <- forecastPower(...)
@@ -112,34 +83,3 @@ energiAPI <- function(data,...){
   }
   return(output)
 }
-
-energiAPI("productionPower", sortDes = "HourUTC", productionType = "all", num = 10000)
-
-energiAPI("forecastPower", startDate = "2024-06-24", forecastType = "solar") 
-
-energiAPI("storageUsage", startDate = "2024-06-24", num = 10000)
-```
-
-summary visuals
-
-```{r}
-
-##NEED TO update price area labels to desc
-
-#one-way contingency
-data_tb |>
-  group_by(ProductionType) |>
-  summarize(count = n())
-
-#two-way contingency
-data_tb |>
-  group_by(ProductionType, PriceArea) |>
-  summarize(count = n()) |>
-  pivot_wider(names_from = PriceArea, values_from = count)
-
-#center
-data_tb |>
-  group_by(ProductionType) |>
-  summarize(mean_co2 = mean(CO2PerkWh), median_co2 = median(CO2PerkWh))
-```
-
