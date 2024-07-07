@@ -11,6 +11,11 @@
 source("helpers.R")
 
 library(shiny)
+library(jsonlite)
+library(dplyr)
+library(httr)
+library(tidyverse)
+library(lubridate)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -27,5 +32,15 @@ function(input, output, session) {
              main = 'Histogram of waiting times')
 
     })
+    output$sumTable <- renderDataTable({
+      
+        if(input$endpoint == "forecastPower"){
+          outputData <- energiAPI(data = input$endpoint, startDate = input$start, forecastType = input$forecast)
+        } else if(input$endpoint == "productionPower"){
+          outputData <- energiAPI(data = input$endpoint, sortDes = input$sort, productionType = input$production, num = input$num) 
+        } else if(input$endpoint == "storageUsage"){
+          outputData <- energiAPI(data = input$endpoint, startDate = input$start, num = input$num)}
+      outputData
+      })
 
 }

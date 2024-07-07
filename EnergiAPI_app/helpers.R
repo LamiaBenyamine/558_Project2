@@ -2,7 +2,7 @@
 
 #Forecasts Power Endpoint function: allows the user to select the start date and the forecast type from the Energi API. Only the current forecast is selected, along with the time stamp when the forecast was generated. The date and time were parsed into different columns.
 
-forecastPower <- function(startDate, forecastType = "all"){
+forecastPower <- function(startDate, forecastType){
   baseURL <- "https://api.energidataservice.dk/dataset/"
   if(forecastType == "all") {
     ep1 <- "Forecasts_Hour?columns=TimestampUTC,PriceArea,ForecastType,ForecastCurrent&start="
@@ -18,7 +18,7 @@ forecastPower <- function(startDate, forecastType = "all"){
   parsed <- fromJSON(urlID)
   data_tb <- as_tibble(parsed$records) |>
     mutate(hour = hour(ymd_hms(TimestampUTC)), TimestampUTC = as_date(ymd_hms(TimestampUTC))) |>
-    select(TimestampUTC, hour, everything())|>
+    select(TimestampUTC, hour, everything())|> #reorder the columns to put date up front
     group_by(TimestampUTC, hour, PriceArea)
   return(data_tb)
 }
@@ -29,7 +29,7 @@ productionPower <- function(sortDes, productionType, num){
   baseURL <- "https://api.energidataservice.dk/dataset/"
   
   if(productionType == "all") {
-    ep1 <- "DeclarationProduction?start=2024-01-01&columns=HourUTC,PriceArea,ProductionType,DeliveryType,CO2PerkWh,SO2PerkWh,NOxPerkWh&sort="
+    ep1 <- "DeclarationProduction?start=2024-05-01&columns=HourUTC,PriceArea,ProductionType,DeliveryType,CO2PerkWh,SO2PerkWh,NOxPerkWh&sort="
     ep2 <- "%20desc&limit="
     urlID <- paste(baseURL, ep1, sortDes, ep2, num, sep = "")
   }
@@ -43,7 +43,7 @@ productionPower <- function(sortDes, productionType, num){
   parsed <- fromJSON(urlID)
   data_tb <- as_tibble(parsed$records) |>
     mutate(dateUTC = as_date(ymd_hms(HourUTC)), hour = hour(ymd_hms(HourUTC))) |>
-    select(dateUTC, hour, 2:6)|>
+    select(dateUTC, hour, 2:6)|> #reorder the columns to put date up front
     group_by(dateUTC, hour, PriceArea)
   return(data_tb)
 }
@@ -60,7 +60,7 @@ storageUsage <- function(startDate, num){
   parsed <- fromJSON(urlID)
   data_tb <- as_tibble(parsed$records) |>
     mutate(GasDay = as_date(ymd_hms(GasDay))) |>
-    select(GasDay, contains("Total"))
+    select(GasDay, contains("Total")) #reorder the columns to put date up front
   return(data_tb)
 }
 

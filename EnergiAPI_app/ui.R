@@ -44,15 +44,13 @@ fluidPage(
                     condition = "input.endpoint == 'forecastPower'",
                       dateInput("start", "Choose Start Date", value = "2024-05-01"),
                       radioButtons("forecast", "Select Forecast Type",
-                                         choiceNames = list("All Forecast Types", "Solar Power", "Offshore Wind Power", "Onshore Wind Power"),
-                                         choiceValues = list("all", "Solar", "Offshore Wind", "Onshore Wind"))
-                            ),
+                                         choices = list("All Forecast Types" = "all", "Solar Power" = "Solar", "Offshore Wind Power" = "Offshore%20Wind", "Onshore Wind Power" = "Onshore%20Wind"))),
                   conditionalPanel(
                     condition = "input.endpoint == 'productionPower'",
                       selectInput("sort", "Select a column to sort by (descending)",
-                                  choices=list("Date & Time (UTC)", "HourUTC", "Price Area" = "PriceArea", "Production Type" = "ProductionType", "Delivery Type" = "DeliveryType", "CO2 per kWh" = "CO2PerkWh", "SO2 per kWh"="SO2PerkWh", "NOx  per kWh"="NOxPerkWh")),
+                                  choices=list("Date & Time (UTC)" = "HourUTC", "Price Area" = "PriceArea", "Production Type" = "ProductionType", "Delivery Type" = "DeliveryType", "CO2 per kWh" = "CO2PerkWh", "SO2 per kWh" = "SO2PerkWh", "NOx  per kWh" = "NOxPerkWh")),
                       radioButtons("production", "Select Production Type",
-                                 choices=list("All Production Types" = "all", "BioGas", "Coal",  "Fossil Oil", "Fossil Gas" = "FossilGas", "Hydro", "Solar", "Straw", "Waste", "Onshore Wind"= "WindOnshore", "Offshore Wind" ="WindOffshore", "Wood" )),
+                                 choices=list("All Production Types" = "all", "BioGas", "Coal",  "Fossil Oil", "Fossil Gas" = "FossilGas", "Hydro", "Solar", "Straw", "Waste", "Onshore Wind" = "WindOnshore", "Offshore Wind" = "WindOffshore", "Wood" )),
                       numericInput("num", h3("Enter the number of records to output"), 
                                    value=0, min=0, max=100000, step=100),
                     em("Note: 0 is all records")
@@ -63,10 +61,12 @@ fluidPage(
                     numericInput("num", h3("Enter the number of records to output"), 
                                  value=0, min=0, max=100000, step=100),
                     em("Note: 0 is all records")
-                  )
+                  ),
+                  actionButton("apply", "Apply Inputs")
                 ),
                 mainPanel(
-                  h2("Plot Output")
+                  h2("Report Output"),
+                  dataTableOutput("sumTable")
                 )
                )
       ),
@@ -88,7 +88,4 @@ fluidPage(
                )
       )
     )
-
-    # Sidebar with a slider input for number of bins
-    
 )
