@@ -75,9 +75,12 @@ fluidPage(
                 ),
                 mainPanel(
                   h2("Report Output"),
-                  DTOutput("sumTable")
-                )
+                  DTOutput("sumTable"),
+                  
+                  downloadButton(
+                    "downloadFile", "Export data to csv file.")
                )
+            )
       ),
       tabPanel("Data Exploration", 
                titlePanel("Data Exploration"),

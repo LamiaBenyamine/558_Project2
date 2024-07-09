@@ -32,15 +32,31 @@ function(input, output, session) {
              main = 'Histogram of waiting times')
 
     })
+    data <- eventReactive(input$apply, {
+      if(input$endpoint == "forecastPower"){
+        energiAPI(data = input$endpoint, startDate = input$start, forecastType = input$forecast)
+      } else if(input$endpoint == "productionPower"){
+        energiAPI(data = input$endpoint, sortDes = input$sort, productionType = input$production, num = input$num) 
+      } else if(input$endpoint == "storageUsage"){
+        energiAPI(data = input$endpoint, startDate = input$start, num = input$num)}
+    })
+    
     output$sumTable <- renderDT({
-      
-        if(input$endpoint == "forecastPower"){
-          outputData <- energiAPI(data = input$endpoint, startDate = input$start, forecastType = input$forecast)
-        } else if(input$endpoint == "productionPower"){
-          outputData <- energiAPI(data = input$endpoint, sortDes = input$sort, productionType = input$production, num = input$num) 
-        } else if(input$endpoint == "storageUsage"){
-          outputData <- energiAPI(data = input$endpoint, startDate = input$start, num = input$num)}
-      outputData
+      data()
       })
+    
+    output$downloadFile <- downloadHandler(
+      filename = function(){
+        paste(input$endpoint,"_export_", Sys.Date(), ".csv", sep="" )
+      },
+      content = function(filename){
+        write.csv(data(),file)
+      }
+    )
+    
+    # <- renderPlot({ })
+    
 
 }
+
+
