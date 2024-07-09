@@ -8,6 +8,12 @@
 #
 
 library(shiny)
+library(jsonlite)
+library(dplyr)
+library(httr)
+library(tidyverse)
+library(lubridate)
+library(DT)
 
 fluidPage(
     tabsetPanel(
@@ -30,7 +36,10 @@ fluidPage(
               h5("Storage Utilization"),
               h2("Data Exploration"),
               em("Note: all dates/times are in UTC time zone"),
-              p("This page allows the user to specify a combination of variables to summarize. The plot types and summary tables will be customizable.")
+              p("This page allows the user to specify a combination of variables to summarize. The plot types and summary tables will be customizable."),
+              #imageOutput("logo", width = 100, height = 300),
+              img(src = "https://www.energidataservice.dk/images/eds-logo.png", width = 600, height = 300 )
+              
       ),
       tabPanel("Data Download", 
                titlePanel("Data Download"),
@@ -66,7 +75,7 @@ fluidPage(
                 ),
                 mainPanel(
                   h2("Report Output"),
-                  dataTableOutput("sumTable")
+                  DTOutput("sumTable")
                 )
                )
       ),

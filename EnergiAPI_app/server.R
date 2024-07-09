@@ -11,15 +11,15 @@
 source("helpers.R")
 
 library(shiny)
-library(jsonlite)
-library(dplyr)
-library(httr)
-library(tidyverse)
-library(lubridate)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
-
+    output$logo <- renderImage({
+      list(src = "eds-logo.jpeg",
+          # content_type = 'image/png',
+           alt = "Energi logo")
+      }, deleteFile = FALSE)
+    
     output$distPlot <- renderPlot({
 
         # generate bins based on input$bins from ui.R
@@ -32,7 +32,7 @@ function(input, output, session) {
              main = 'Histogram of waiting times')
 
     })
-    output$sumTable <- renderDataTable({
+    output$sumTable <- renderDT({
       
         if(input$endpoint == "forecastPower"){
           outputData <- energiAPI(data = input$endpoint, startDate = input$start, forecastType = input$forecast)
