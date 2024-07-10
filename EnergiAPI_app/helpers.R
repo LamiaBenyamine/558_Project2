@@ -29,12 +29,12 @@ productionPower <- function(sortDes, productionType, num){
   baseURL <- "https://api.energidataservice.dk/dataset/"
   
   if(productionType == "all") {
-    ep1 <- "DeclarationProduction?start=2024-05-01&columns=HourUTC,PriceArea,ProductionType,DeliveryType,CO2PerkWh,SO2PerkWh,NOxPerkWh&sort="
+    ep1 <- "DeclarationProduction?start=2024-01-01&columns=HourUTC,PriceArea,ProductionType,DeliveryType,CO2PerkWh,SO2PerkWh,NOxPerkWh,COPerkWh&sort="
     ep2 <- "%20desc&limit="
     urlID <- paste(baseURL, ep1, sortDes, ep2, num, sep = "")
   }
   else {
-    ep1 <- "DeclarationProduction?start=2024-01-01&columns=HourUTC,PriceArea,ProductionType,DeliveryType,CO2PerkWh,SO2PerkWh,NOxPerkWh&filter={\"ProductionType\":[\""
+    ep1 <- "DeclarationProduction?start=2024-01-01&columns=HourUTC,PriceArea,ProductionType,DeliveryType,CO2PerkWh,SO2PerkWh,NOxPerkWh,COPerkWh&filter={\"ProductionType\":[\""
     ep2 <- "\"]}&sort="
     ep3 <- "%20desc&limit="
     urlID <- paste(baseURL, ep1, productionType, ep2, sortDes, ep3, num, sep = "")
@@ -76,6 +76,7 @@ energiAPI <- function(data,...){
   else if(data == "storageUsage"){
     output <- storageUsage(...)
   }
+  #Not really necessary since the user selections do not allow for any other inputs.
   else {
     print("ERROR: Please input a valid data argument: forecastPower, productionPower, storageUsage")
     return(NA_real_)
