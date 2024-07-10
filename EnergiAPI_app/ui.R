@@ -27,17 +27,21 @@ fluidPage(
               p("Energinet is an independent public enterprise owned by the Danish Ministry of Energy, Utilities and Climate."),
               a(href = "https://www.energidataservice.dk/", "For more information click this link"),
               hr(),
-              h1("Page Details"),
+              h1("Tab Details"),
               h2("Data Download"),
               p("This page allows the user to specify any changes to the Energi API and return the data. The user will also be able to subset the rows and columns of the dataset and save to .csv file."),
               h4("Endpoints"),
-              h5("Forecast Wind and Solar Power"), h6("Start Date, Forecast Type (all, solar, hydro)"),
-              h5("Declaration, Production Types and Emissions"),
-              h5("Storage Utilization"),
-              h2("Data Exploration"),
+              a(href="https://www.energidataservice.dk/tso-electricity/Forecasts_Hour", h5("Forecast Wind and Solar Power")), 
+              p("-The forecast valid for the current time. The user inputs are: Start Date, Forecast Type (all, solar, hydro)"),
+              a(href= "https://www.energidataservice.dk/tso-electricity/DeclarationProduction#metadata-info", h5("Declaration, Production Types and Emissions")),
+              p("-Declaration of production per Price area per hour. The user inputs are: Columns Sort Descending, Production Type (all, ...), Number of records"),
+              a(href= "https://www.energidataservice.dk/gas-storage-denmark/StorageUtilization", h5("Storage Utilization")),
+              p("-The total stored, injected, and withdrawn Gas per day (MWh). The user inputs are: Start Date, and Number of records"),
               em("Note: all dates/times are in UTC time zone"),
+              br(),
+              em("Denmark is divided in two price areas (bidding zones) divided by the Great Belt. DK1 is west of the Great Belt and DK2 is east of the Great Belt."),
+              h2("Data Exploration"),
               p("This page allows the user to specify a combination of variables to summarize. The plot types and summary tables will be customizable."),
-              #imageOutput("logo", width = 100, height = 300),
               img(src = "https://www.energidataservice.dk/images/eds-logo.png", width = 600, height = 300 )
               
       ),
@@ -84,20 +88,25 @@ fluidPage(
       ),
       tabPanel("Data Exploration", 
                titlePanel("Data Exploration"),
-               sidebarLayout(
-                 sidebarPanel(
-                   sliderInput("bins",
-                               "Number of bins:",
-                               min = 1,
-                               max = 50,
-                               value = 30)
-                 ),
-                 
+               h3("Summarize data from the Declaration, Production Types and Emissions dataset."),
+               
                  # Show a plot of the generated distribution
-                 mainPanel(
-                   plotOutput("distPlot")
-                 )
-               )
-      )
+                   
+                   fluidRow(
+                     h4("Summary Plots"),
+                     plotOutput("plot")
+                     ),
+                   
+                   fluidRow(
+                     h4("Summary Tables"),
+                     fluidRow(
+                       column(4, selectInput("tab", "Select dataset",
+                                          choices=list("Forecast Power"="forecastPower", "Production Power"="productionPower"))),
+                       column(4, "Select categorical variables"),
+                       column(4, actionButton("apply2", "Apply Inputs"))
+                     ),
+                     DTOutput("dataTable")
+                   )
     )
+)
 )
